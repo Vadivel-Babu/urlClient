@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cyan: #2bd0d0;
+  --custom-white: #eff1f7;
+  --custom-gray: #9e9aa8;
+  --custom-darkblue: #4b3f6b;
+  --custom-deepDarkblue: #3a3054;
+  --custom-lightblack: #34313d;
+}

@@ -5,7 +5,7 @@ Developed a URL shortening web application using the MERN (MongoDB, Express.js, 
 How to run this app localy:
 
 ```
-1.git clone the repo
+1.clone the repo
 2.run npm install
 3.run npm run dev
 

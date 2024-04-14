@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import Footer from "./components/Footer";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8000/api/";
+axios.defaults.baseURL = "https://urlbackend-psdy.onrender.com/api/";
 
 function App() {
   return (

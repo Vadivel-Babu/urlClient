@@ -1,35 +1,61 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Linkcard from "./Linkcard";
 import axios from "axios";
 import { toast } from "react-toastify";
 //@ts-ignore
 import isUrl from "is-valid-http-url";
+//@ts-ignore
+import { AuthContext } from "../context/AuthContext";
 import { Button } from "@nextui-org/react";
+import { useNavigate } from "react-router-dom";
 
 const Linkform: React.FC = () => {
   const [link, setLink] = useState<string>("");
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  //@ts-ignore
+  const { user } = useContext(AuthContext);
+
   const [urls, setUrls] = useState<string[]>([]);
 
   async function getLinks() {
-    const { data } = await axios.get("link/getlinks");
-    setUrls(data.data);
+    try {
+      const { data } = await axios.get("link/getlinks", {
+        headers: { Authorization: "Bearer " + user?.token },
+      });
+      if (data.message === "success") {
+        setUrls(data.data || []);
+      } else {
+        setUrls([]);
+      }
+    } catch (error) {
+      //@ts-ignore
+      toast.error(error.response.data.message);
+      setUrls([]);
+    }
   }
 
   useEffect(() => {
     getLinks();
-  }, [handleSubmit, handleDelete]);
+  }, [user]);
 
   async function handleDelete(id: string) {
     const { data } = await axios.delete(`link/deletlink/${id}`);
     if (data.message === "success") {
       toast.warning("Link deleted");
+      getLinks();
     }
   }
 
   async function handleSubmit(e: { preventDefault: () => void }) {
     try {
       e.preventDefault();
+      if (!user?.token) {
+        toast.warning("login or register to short the link");
+        navigate("/signup");
+        return;
+      }
 
       if (!isUrl(link)) {
         toast.error("Enter valid Url");
@@ -39,14 +65,14 @@ const Linkform: React.FC = () => {
         url: link,
       };
       setLoading(true);
-      const { data } = await axios.post(
-        "http://localhost:8000/api/postlink",
-        newLink
-      );
+      const { data } = await axios.post("link/postlink", newLink, {
+        headers: { Authorization: "Bearer " + user?.token },
+      });
 
       if (data.message === "success") {
         toast.success("Link shortend");
         setLoading(false);
+        getLinks();
         setLink("");
       } else {
         toast.error("Error");
@@ -55,6 +81,7 @@ const Linkform: React.FC = () => {
       }
     } catch (error: any) {
       toast.error(error.response.message);
+      setLoading(false);
     }
   }
   return (
